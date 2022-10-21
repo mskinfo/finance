@@ -1,143 +1,75 @@
+# section 1 percentile information
 bottom25USD = int(25000)
 mid50USD = int(46001)
 top25USD = int(80002)
 topUSD = int(401622)
-SOSNT_bracket10pct = float(9950)
-SOSNT_bracket12pct = float(40525)
-SOSNT_bracket22pct = float(86375)
-SOSNT_bracket24pct = float(164925)
-SOSNT_bracket32pct = float(209425)
-SOSNT_bracket35pct = float(314150)
-SOSNT_bracket37pct = float(314151)
+# section 1.1: tax information
+# this section should eventually have different filing methods, state rates,
+# and other options for users to measure their take-home pay (401K, IRA contributions, etc.)
+# section 1.1.1 federal tax info
+# upper limits of income in tax bracket
+# the 37% rate should be applied to anything greater than SOSNT_bracket35pct
+SOSNT_bracket10pct = range(1, 10275, 1)
+SOSNT_bracket12pct = range(10275, 41775, 1)
+SOSNT_bracket22pct = range(41775, 89075, 1)
+SOSNT_bracket24pct = range(89075, 170050, 1)
+SOSNT_bracket32pct = range(170050, 215950, 1)
+SOSNT_bracket35pct = range(215950, 539900, 1)
+# marginal tax rates at each bracket
+bracket_rate_under_10 = float(.1)
+bracket_rate_10_to_41 = float(.12)
+bracket_rate_41_to_89 = float(.22)
+bracket_rate_89_to_170 = float(.24)
+bracket_rate_170_to_215 = float(.32)
+bracket_rate_215_to_539 = float(.35)
+bracket_rate_above_539 = float(.37)
+# tax payment at the end of each bracket
+pmt_over_10 = float(bracket_rate_under_10*10275)
+pmt_over_41 = float(bracket_rate_10_to_41*(41775-10275)+pmt_over_10)
+pmt_over_89 = float(bracket_rate_41_to_89*(89075-41775)+pmt_over_41)
+pmt_over_170 = float(bracket_rate_89_to_170*(170050-89075)+pmt_over_89)
+pmt_over_215 = float(bracket_rate_170_to_215*(215950-170050)+pmt_over_170)
+pmt_over_539 = float(bracket_rate_215_to_539*(539900-215950)+pmt_over_215)
 
+income = int(input('enter your yearly income: USD $'))
 
-def tax_income_salary(income):
-    if income - SOSNT_bracket37pct <= 0:
-        if income - SOSNT_bracket35pct <= 0:
-            if income - SOSNT_bracket32pct <= 0:
-                if income - SOSNT_bracket24pct <= 0:
-                    if income - SOSNT_bracket22pct <= 0:
-                        if income - SOSNT_bracket12pct <= 0:
-                            if income - SOSNT_bracket10pct <= 0:
-                                return income * (1 - .10)
-                        else:
-                            return (income - SOSNT_bracket12pct) * (1 - .12) \
-                                   + income * (1 - .10)
-                    else:
-                        return (income - SOSNT_bracket22pct) * (1 - .22) + (income - SOSNT_bracket12pct) * (1 - .12) \
-                               + income * (1 - .10)
-                else:
-                    return (income - SOSNT_bracket24pct) * (1 - .24) \
-                           + (income - SOSNT_bracket22pct) * (1 - .22) + (income - SOSNT_bracket12pct) * (1 - .12) \
-                           + income * (1 - .10)
-            else:
-                return (income - SOSNT_bracket32pct) * (1 - .32) + (income - SOSNT_bracket24pct) * (1 - .24) \
-                       + (income - SOSNT_bracket22pct) * (1 - .22) + (income - SOSNT_bracket12pct) * (1 - .12) + \
-                       income * (1 - .10)
-        else:
-            return (income - SOSNT_bracket35pct) * (1 - .35) + (income - SOSNT_bracket32pct) * (1 - .32) + \
-                   (income - SOSNT_bracket24pct) * (1 - .24) + (income - SOSNT_bracket22pct) * (1 - .22) + \
-                   (income - SOSNT_bracket12pct) * (1 - .12) + income * (1 - .10)
-    else:
-        return (income - SOSNT_bracket37pct) * (1 - .37) + (income - SOSNT_bracket35pct) * (1 - .35) \
-               + (income - SOSNT_bracket32pct) * (1 - .32) + (income - SOSNT_bracket24pct) * (1 - .24) \
-               + (income - SOSNT_bracket22pct) * (1 - .22) + (income - SOSNT_bracket12pct) * (1 - .12) \
-               + income * (1 - .10)
+print()
 
+if income in SOSNT_bracket10pct:
+    tax_payment = float(income*bracket_rate_under_10)
+    marginal_tax_rate = bracket_rate_under_10*100
+if income in SOSNT_bracket12pct:
+    tax_payment = float(((income-10275)*bracket_rate_10_to_41)+pmt_over_10)
+    marginal_tax_rate = bracket_rate_10_to_41*100
+if income in SOSNT_bracket22pct:
+    tax_payment = float(((income-41775)*bracket_rate_41_to_89)+pmt_over_41)
+    marginal_tax_rate = bracket_rate_41_to_89*100
+if income in SOSNT_bracket24pct:
+    tax_payment = float(((income-89075)*bracket_rate_89_to_170)+pmt_over_89)
+    marginal_tax_rate = bracket_rate_89_to_170*100
+if income in SOSNT_bracket32pct:
+    tax_payment = float(((income-170050)*bracket_rate_170_to_215)+pmt_over_170)
+    marginal_tax_rate = bracket_rate_170_to_215*100
+if income in SOSNT_bracket35pct:
+    tax_payment = float(((income-215950)*bracket_rate_215_to_539)+pmt_over_215)
+    marginal_tax_rate = bracket_rate_215_to_539*100
+if income > 539900:
+    tax_payment = float(((income-539900)*bracket_rate_above_539)+pmt_over_539)
+    marginal_tax_rate = bracket_rate_above_539*100
 
-print('let\'s start with your income before taxes...')
-income_type = input("are you paid by the hour or on a salary? ")
-if income_type.lower() not in ('by the hour', 'hourly', 'hour', 'per hour', 'h',
-                               'on a salary', 'salary', 'salaried', 'salary', 's'):
-    print(" if you're paid hourly enter 'by the hour', 'hourly', 'hour', 'per hour', or 'h'. \n "
-          "if you are a salaried worker, enter 'on a salary', 'salary', 'salaried', 'salary', or 's' ")
+state_tax_estimated_payment = float(income*.1)
+
+if income <= 143500:
+    FICA_payment = float(income*0.0765)
 else:
-    # salaried user inputs
-    if income_type in ('on a salary', 'salary', 'salaried', 'salary', 's'):
-        paycheck_times = float(input("how many times per year do you receive your paycheck? "))
-        while paycheck_times is None:
-            try:
-                paycheck_times = float(input("how many times per year do you receive your paycheck? "))
-            except ValueError:
-                print("'{}' is not an acceptable value.  Try entering a number or an integer, "
-                      "like 50.5 or 42.".format(paycheck_times))
-        discrete_income_amount = float(input("how large is your paycheck each time your are paid? "))
-        while discrete_income_amount is None:
-            try:
-                discrete_income_amount = float(input("how large is your paycheck each time your are paid? "))
-            except ValueError:
-                print("'{}' is not an acceptable value.  Try entering a number or"
-                      " an integer, like 2000 or 25993.32.".format(discrete_income_amount))
-        pretaxincomesalaried_user = discrete_income_amount * paycheck_times
-        print()
-        print("Your gross annual income: ", pretaxincomesalaried_user)
-        if pretaxincomesalaried_user <= bottom25USD:
-            print("Your gross annual income is less than that of the top 75% of Americans.")
-        else:
-            if pretaxincomesalaried_user <= mid50USD:
-                print("Your gross annual income is less than that of the top 50% of Americans.")
-            else:
-                if pretaxincomesalaried_user <= top25USD:
-                    print("Your gross annual income is more than that of the bottom 50% of Americans.")
-                else:
-                    if pretaxincomesalaried_user <= topUSD:
-                        print("Your gross annual income is more than that of the top 75% of Americans.")
-                    else:
-                        if pretaxincomesalaried_user > topUSD:
-                            print("Your gross annual income is more than that of the top 99% of Americans.")
+    FICA_payment = float(14350)
 
-        salaried_user_income_taxed = tax_income_salary(pretaxincomesalaried_user)
-        tax_payment_salaried_user = -1 * (pretaxincomesalaried_user - salaried_user_income_taxed)
-        average_tax_salaried_user = (tax_payment_salaried_user / salaried_user_income_taxed) * 100
+yearly_net_income = float(income - state_tax_estimated_payment - FICA_payment - tax_payment)
+monthly_net_income = float(yearly_net_income/12)
 
-        print("your income after taxes is", salaried_user_income_taxed)
-        print("your average tax rate is", average_tax_salaried_user, "percent")
-        print("uncle sam takes", tax_payment_salaried_user, "out of your gross annual income.")
-    # wagie inputs
-    if income_type in ('by the hour', 'hourly', 'hour', 'per hour', 'h'):
-        wage = float(input("what is your hourly wage? "))
-        while wage is None:
-            try:
-                wage = float(input("how large is your paycheck each time your are paid? "))
-            except ValueError:
-                print("'{}' is not an acceptable value.  Try entering a number or"
-                      " an integer, like 7.25 or 69.".format(wage))
-        hours_worked = float(input("how many hours do you work per week? "))
-        while hours_worked is None:
-            try:
-                hours_worked = float(input("how many hours do you work per week? "))
-            except ValueError:
-                print("'{}' is not an acceptable value.  Try entering a number or"
-                      " an integer, like 42.069 or 69".format(hours_worked))
-        weeks_worked = float(input("how many weeks do you work per year? "))
-        while weeks_worked is None:
-            try:
-                weeks_worked = float(input("how many weeks do you work per year? "))
-            except ValueError:
-                print("'{}' is not an acceptable value.  Try entering a number or"
-                      " an integer, like 40.5 or 52.".format(weeks_worked))
-        pretaxincomewagie = weeks_worked * hours_worked * wage
-        print()
-        print("Your gross annual income: ", pretaxincomewagie)
-        if pretaxincomewagie <= bottom25USD:
-            print("Your gross annual income is less than that of the top 75% of Americans.")
-        else:
-            if pretaxincomewagie <= mid50USD:
-                print("Your gross annual income is less than that of the top 50% of Americans.")
-            else:
-                if pretaxincomewagie <= top25USD:
-                    print("Your gross annual income is more than that of the bottom 50% of Americans.")
-                else:
-                    if pretaxincomewagie <= topUSD:
-                        print("Your gross annual income is more than that of the top 75% of Americans.")
-                    else:
-                        if pretaxincomewagie > topUSD:
-                            print("Your gross annual income is more than that of the top 99% of Americans.")
+input('All-Righty! We\'ve got some numbers for ya... (press enter to continue)')
+print()
+print('Your annual take-home pay is USD ',yearly_net_income)
+print()
+print('Your monthly take-home pay is USD ',monthly_net_income)
 
-        wagie_income_taxed = tax_income_salary(pretaxincomewagie)
-        tax_payment_wagie = (pretaxincomewagie - wagie_income_taxed)
-        average_tax_wagie = (tax_payment_wagie / pretaxincomewagie) * 100
-
-        print("your income after taxes is", wagie_income_taxed)
-        print("your average tax rate is", average_tax_wagie, "percent")
-        print("uncle sam takes", tax_payment_wagie, "out of your gross annual income.")
