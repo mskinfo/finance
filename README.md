@@ -1,2 +1,2 @@
 # financial-advisor
-this financial advisor application is meant for **financial advisors** to use to help streamline the workflow for their clients.  for example, the application would allow financial advisors to calculate what an individual should budget in order to retire at a certain age, how to choose a home and a mortgage rate that fits their budget, and which insurance policies are the best for their situation.
+this repository contains all of the finance related stuff I am comfortable posting on github.
